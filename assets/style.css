@@ -1,0 +1,171 @@
+html,body,input{
+	margin:0;padding:0;
+	background:#FFF;
+	font-size:18px;
+	color:#626262;
+}
+#price-table, #plot-table {
+	background:#fff;
+	margin-top:42px;
+	border-top:2px solid #7d9b02;
+	border-bottom:3px solid #333;
+	width:968px;
+}
+
+#price-table, #plot-table tbody td{
+	height:44px;
+	line-height:44px;
+	border-bottom:1px solid #f7f0dd;
+	border-right:1px solid #f7f0dd;
+	border-left:1px solid #ebf9ff;
+	color:#626262;
+	text-align:center;
+}
+
+td.divide {
+	height: 8px;
+	background: #FF0000;
+}
+
+td input{
+	background:none;
+	border:none;
+	font-size:17px;
+	color:#626262;
+	margin:0;padding:0;
+	height:44px;
+	line-height:44px;
+	text-align:center;
+	width:100%;
+}
+td.name input{
+	text-align:left;
+	padding-left:20px;
+}
+#price-table tbody tr.first input{
+	color:#fff;
+}
+#price-table tbody tr.hover input{
+	color:#626262;
+}
+#price-table tbody tr.first td{
+	background:url(hover-bg.png) repeat-x;
+	border-right:1px solid #81981f;
+	border-left:1px solid #aec64c;
+	border-bottom:1px solid #7d9809;	
+}
+#price-table tbody tr.hover td{
+	background:#FFF;	
+	border-bottom:1px solid #f7f0dd;
+	border-right:1px solid #f7f0dd;
+	border-left:1px solid #ebf9ff;
+}
+#price-table tbody tr td input.error{
+	color:red;
+}
+#price-table .row0 td{
+	background:#ECE5B6;
+}
+#price-table .row1 td{
+	background:#AFDCEC;
+}
+#price-table, #plot-table  thead td{
+	background:#f6f6f6 url(head-bg.png) repeat-x;
+	text-align:center;
+	height:40px;
+	line-height:40px;
+	border-bottom:1px solid #f7f0dd;
+	border-right:1px solid #f7f0dd;
+	border-left:1px solid #ebf9ff;
+	color:#8e8e8e;
+	font-weight:bold;
+}
+div > .button{
+	background:url(button_bg.png) repeat-x;
+	height:25px;
+	line-height:25px;
+	color:#fff;
+	margin-top:10px;
+	cursor:pointer;
+	border:solid 1px #a3c127;
+	color:#fff;
+	text-transform:uppercase;
+	font-size:11px;
+}
+.toolbar{
+	text-align:left;
+	width:968px;
+	
+}
+.loadbar{
+	text-align:right;
+	width:968px;
+	margin-top:-35px;
+}
+.report{
+	width:968px;
+	display:none;
+	text-align:left;
+}
+#report-ste .ste .frame iframe{
+	width:966px;
+}
+#report-ste .ste .frame {
+	border-color:#D3D3D3;
+}
+.source{
+	display:none;
+}
+#header{
+	margin-top:40px;
+	width:968px;
+	font-weight:bold;
+	border:1px solid #d3d3d3;
+	border-bottom:none;
+	
+	
+}
+#header td input,#header td {
+	font-weight:bold;
+	text-transform:uppercase;
+	height:49px;
+	line-height:49px;
+	color:#777777;
+}
+#header .company input{
+	font-size:30px;
+	color:#85a10f;
+}
+#header .auction input{
+	font-size:22px;
+}
+#header td{
+	background:#efefef;
+	border-bottom:1px solid #d3d3d3;
+	padding: 0 12px;
+}
+#header tr{
+	border:1px solid #333;
+}
+#header .step-price{
+	text-align:right;
+}
+#header .start-price{
+	text-align:left;
+}
+#header .step-price input,#header .start-price input{
+	color:#85a10f;
+	width:180px;
+	text-align:left;
+	margin-left:10px;
+}
+
+@media print{
+	.toolbar,.loadbar,.bar{
+		display:none;
+	}
+}
+
+.tableplot {
+	display:none;
+}
