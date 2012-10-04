@@ -356,6 +356,8 @@ function arrangeRowColor(){
 function getPlots(stt) {
 	var plotsCol = "plots" + stt;
 	var plot_str = $('input[name='+plotsCol+']').val();
+	if (plot_str == "")
+		return 0;
 	var plots_arr = plot_str.split(',');
 	return plots_arr;
 }
@@ -380,11 +382,14 @@ function totalPrice(stt) {
 function checkPlots(stt) {
 	var plots = getPlots(stt);
 	var check = true;
-	for (var i = 0; i < plots.length; i++){
-		areaId = "#areaId" + $.trim(plots[i]);
-		if($(areaId).length <= 0)
-			check = false;
-  }
+
+	if (plots.length > 0) {
+		for (var i = 0; i < plots.length; i++){
+			areaId = "#areaId" + $.trim(plots[i]);
+			if($(areaId).length <= 0)
+				check = false;
+		}
+	}
 
 	if (check == false) {
 		$('input[name=note'+stt+']').val("Kiểm tra lại lô đất").css('color','red');
@@ -445,6 +450,7 @@ function divideTop(){
 function recalculate(){
 	$("#price-table tbody tr .plots input").each(function () {
 		var stt_arr = this.name.split('plots');
-		totalPrice(stt_arr[1]);
+		if (checkPlots(stt_arr[1]))
+			totalPrice(stt_arr[1]);
 	});
 }
