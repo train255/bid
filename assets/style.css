@@ -150,10 +150,10 @@ div > .button{
 #header .step-price{
 	text-align:right;
 }
-#header .start-price{
+#header .start-price, #header .win_number{
 	text-align:left;
 }
-#header .step-price input,#header .start-price input{
+#header .step-price input,#header .start-price input,#header .win_number input{
 	color:#85a10f;
 	width:180px;
 	text-align:left;

@@ -434,8 +434,11 @@ function setPlotId(el,areaName) {
 function divideTop(){
 	$("#divide_td").remove();
 	var rowdiv = '<td id="divide_td" class="divide" colspan="9"><td>';
+	var top = $('input[name=win_number]').val();
+	if (top < 10)
+		top = "0" + top;
 	$("#price-table tbody tr .stt input").each(function () {
-		if ($(this).val() == "02") {
+		if ($(this).val() == top) {
 			var row2 = $(this).parents("tr");
 			$(row2).after(rowdiv);
 		}
