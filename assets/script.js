@@ -402,11 +402,6 @@ function checkPlots(stt) {
 }
 
 function showTablePlot() {
-	$("#price-table tbody tr .note input").each(function () {
-		if(this.value == "Kiểm tra lại lô đất")
-			this.value = "";
-	});
-
 	if ($('.tableplot').is(":hidden"))
 		$('.tableplot').slideDown("fast");
 	else
