@@ -46,6 +46,7 @@ $(document).ready(function () {
 	setAuctionList();
 	$("body").hide();
 	$("body").fadeIn();
+	
 });
 
 function addNewRow() {
@@ -99,8 +100,6 @@ function sort(el) {
 	else{
 		row.find(".note input").val("Phạm quy");
 		row.find("input").addClass("error");
-		if(!$(el).closest("tr").is(":last-child"))
-			row.insertAfter($("#price-table tbody tr .price input:last").parents("tr"));
 	}
 
 	var last = null;
@@ -120,6 +119,9 @@ function sort(el) {
 			}
 		}
 	});
+
+	if(last)
+		row.insertAfter(last);
 	
 	$(el).removeClass("current");
 	
@@ -169,7 +171,7 @@ function arrangeRowColor(){
 	});
 
 	$("#price-table tbody tr .orderprice input").each(function () {
-		if ($(this).val() == "001" && !this.hasClass("error")) {
+		if ($(this).val() == "001" && !$(this).hasClass("error")) {
 			var row_orderprice = $(this).parents("tr");
 			$(row_orderprice).addClass("first");
 		}
