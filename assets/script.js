@@ -46,7 +46,6 @@ $(document).ready(function () {
 	setAuctionList();
 	$("body").hide();
 	$("body").fadeIn();
-	
 });
 
 function addNewRow() {
@@ -62,8 +61,8 @@ function addNewRow() {
 	if (stt < 10)
 		stt = "0" + stt;
 	html += '<td class="stt"><input name="stt' + stt + '" value="' + stt + '"  type="text" /></td>';
-	html += '<td class="code"><input name="code' + stt + '" value="" type="text" onchange="fillName(this)"  /></td>';
-	html += '<td class="name"><input name="customername' + stt + '" value="" type="text" /></td>';
+	html += '<td class="code"><input name="code' + stt + '" value="" type="text" onchange="fillName(this)"  /></td>'; 
+	html += '<td class="name"><textarea name="customername' + stt + '" value="" rows=1 class="expand"></textarea></td>';
 	html += '<td class="price"><input name="price' + stt + '" value="" type="text" onchange="sort(this)" /></td>';
 	html += '<td class="orderprice"><input name="orderprice' + stt + '" value="" type="text" /></td>';
 	html += '<td class="plots"><input name="plots'+stt+'" value="" type="text" onchange=checkPlots("'+stt+'") /></td>';
@@ -74,6 +73,7 @@ function addNewRow() {
 	
 	$("#price-table tbody").append(html);
 	bindHover();
+	$("textarea[class*=expand]").TextAreaExpander();
 }
 
 function bindHover() {
@@ -110,8 +110,12 @@ function sort(el) {
 		if (this.value && !$(this).hasClass("current")) {
 			var rowcompare = $(this).parents("tr");
 			
-			if (parseInt(this.value.replace(/,/g,"")) < parseInt(el.value.replace(/,/g,""))) {
-				row.insertBefore(rowcompare);
+			if (parseInt(this.value.replace(/,/g,"")) < parseInt(el.value.replace(/,/g,""))
+					|| $(this).hasClass("error")) {
+				if($(el).hasClass("error"))
+					row.insertAfter(rowcompare);
+				else
+					row.insertBefore(rowcompare);
 				last = null;
 				return false;
 			} else {
@@ -155,7 +159,7 @@ function arrangeRowColor(){
 			if (currentvalue)
 				number++;
 		}
-		if (currentvalue && $(this).find("input").parents("tr").className != "error") {
+		if (currentvalue) {
 			if (number < 10)
 				$(this).find(".orderprice input").val("00" + number);
 			else
@@ -226,11 +230,11 @@ function save() {
 		if(this.value){
 			var i = getKeyArray(this.value,customerCode);
 			if(i != -1){
-				customerName[i] = $(".name input:eq("+eq+")").val();
+				customerName[i] = $(".name textarea:eq("+eq+")").val();
 			}
 			else{
 				customerCode.push(this.value);
-				customerName.push($(".name input:eq("+eq+")").val());
+				customerName.push($(".name textarea:eq("+eq+")").val());
 			}
 		}
 		eq ++;
@@ -282,6 +286,7 @@ function loadAuction() {
 		$('.report').slideUp("fast");
 		$("body").hide();
 		$("body").fadeIn();
+		$("textarea[class*=expand]").TextAreaExpander();
 	}
 	
 }

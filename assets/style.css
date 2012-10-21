@@ -13,7 +13,7 @@ html,body,input{
 }
 
 #price-table, #plot-table tbody td{
-	height:44px;
+/*	height:44px;*/
 	line-height:44px;
 	border-bottom:1px solid #f7f0dd;
 	border-right:1px solid #f7f0dd;
@@ -25,6 +25,17 @@ html,body,input{
 td.divide {
 	height: 8px;
 	background: #FF0000;
+}
+
+td textarea{
+	resize: none;
+	background:none;
+	border:none;
+	font-size:17px;
+	color:#626262;
+	margin:0;padding:0;
+	text-align:center;
+	width:100%;
 }
 
 td input{
@@ -49,7 +60,8 @@ td.name input{
 	color:#626262;
 }
 #price-table tbody tr.first td{
-	background:url(hover-bg.png) repeat-x;
+/*	background:url(hover-bg.png) repeat;*/
+	background:#66CC00;
 	border-right:1px solid #81981f;
 	border-left:1px solid #aec64c;
 	border-bottom:1px solid #7d9809;	
