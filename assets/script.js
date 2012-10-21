@@ -91,6 +91,7 @@ function sort(el) {
 	var stepPrice = parseInt($(".step-price input").val().replace(/,/g,""));
 	var startPrice = parseInt($(".start-price input").val().replace(/,/g,""));
 	var selectPrice = parseInt(el.value.replace(/,/g,""));
+
 	if(selectPrice%stepPrice == 0 && selectPrice >= startPrice){
 		row.find("input").removeClass("error");
 		row.find(".note input").val(row.find(".note input").val().replace("Phạm quy",""));
@@ -98,13 +99,14 @@ function sort(el) {
 	else{
 		row.find(".note input").val("Phạm quy");
 		row.find("input").addClass("error");
+		if(!$(el).closest("tr").is(":last-child"))
+			row.insertAfter($("#price-table tbody tr .price input:last").parents("tr"));
 	}
-	
+
 	var last = null;
-	if($("#price-table tbody tr .price input:first").val()==""){
+	if($("#price-table tbody tr .price input:first").val()=="" && !$(el).hasClass("error")){
 		row.insertBefore($("#price-table tbody tr:first"));
-		
-	}else
+	} else
 	$("#price-table tbody tr .price input").each(function () {
 		if (this.value && !$(this).hasClass("current")) {
 			var rowcompare = $(this).parents("tr");
@@ -116,12 +118,8 @@ function sort(el) {
 			} else {
 				last = rowcompare;
 			}
-			
 		}
 	});
-	if (last) {
-		row.insertAfter(last);
-	}
 	
 	$(el).removeClass("current");
 	
@@ -129,8 +127,7 @@ function sort(el) {
 	arrangeRowColor();
 
 	var stt_arr = el.name.split('price');
-	if(checkPlots(stt_arr[1])==true)
-		totalPrice(stt_arr[1]);
+	totalPrice(stt_arr[1]);
 }
 
 function updateOrder() {
@@ -143,6 +140,40 @@ function updateOrder() {
 			$(this).val(number);
 	});
 	divideTop();
+}
+
+function arrangeRowColor(){
+	var alternate = 1;
+	var altervalue = 0;
+	var number = 0;
+	$("#price-table tbody tr").each(function () {
+		var currentvalue = $(this).find(".price input").val();
+		if (currentvalue != altervalue || currentvalue == "") {
+			alternate *= -1;
+			if (currentvalue)
+				number++;
+		}
+		if (currentvalue && $(this).find("input").parents("tr").className != "error") {
+			if (number < 10)
+				$(this).find(".orderprice input").val("00" + number);
+			else
+				$(this).find(".orderprice input").val(number);
+		}
+		
+		if (alternate > 0)
+			this.className = "row1";
+		else
+			this.className = "row0";
+		altervalue = currentvalue;
+		
+	});
+
+	$("#price-table tbody tr .orderprice input").each(function () {
+		if ($(this).val() == "001" && !this.hasClass("error")) {
+			var row_orderprice = $(this).parents("tr");
+			$(row_orderprice).addClass("first");
+		}
+	});
 }
 
 function formatPrice(el){
@@ -319,40 +350,6 @@ function delRow(row_id,table_name){
 		recalculate();
 }
 
-function arrangeRowColor(){
-	var alternate = 1;
-	var altervalue = 0;
-	var number = 0;
-	$("#price-table tbody tr").each(function () {
-		var currentvalue = $(this).find(".price input").val();
-		if (currentvalue != altervalue || currentvalue == "") {
-			alternate *= -1;
-			if (currentvalue)
-				number++;
-		}
-		if (currentvalue) {
-			if (number < 10)
-				$(this).find(".orderprice input").val("00" + number);
-			else
-				$(this).find(".orderprice input").val(number);
-		}
-		
-		if (alternate > 0)
-			this.className = "row1";
-		else
-			this.className = "row0";
-		altervalue = currentvalue;
-		
-	});
-
-	$("#price-table tbody tr .orderprice input").each(function () {
-		if ($(this).val() == "001") {
-			var row_orderprice = $(this).parents("tr");
-			$(row_orderprice).addClass("first");
-		}
-	});
-}
-
 function getPlots(stt) {
 	var plotsCol = "plots" + stt;
 	var plot_str = $('input[name='+plotsCol+']').val();
@@ -393,7 +390,7 @@ function checkPlots(stt) {
 
 	if (check == false) {
 		$('input[name=note'+stt+']').val("Kiểm tra lại lô đất").css('color','red');
-	}	else {
+	}	else if (check == true) {
 		$('input[name=note'+stt+']').val("");
 		totalPrice(stt);
 	}
