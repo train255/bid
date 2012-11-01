@@ -84,22 +84,44 @@ function bindHover() {
 	});
 }
 
+function getLastRow() {
+	var lastRow = 1;
+	$("#price-table tbody tr").each(function (){
+		var st = $(this).find(".stt input").val();
+		var co = $(this).find(".code input").val();
+		var na = $(this).find(".name textarea").val();
+		var pr = $(this).find(".price input").val();
+		var or = $(this).find(".orderprice input").val();
+		var pl = $(this).find(".plots input").val();
+		var to = $(this).find(".totalprice input").val();
+		if(co != "" || na != "" || or != "" || pl != "" || pr != "" || to != "") {
+			if(lastRow < st)
+				lastRow = st;
+		}
+	});
+	return lastRow;
+}
+
 function sort(el) {
+	var lastRowNumber = getLastRow();
+	var lastRow = $("#price-table tbody tr:eq("+lastRowNumber+")");
+
 	var row = $(el).parents("tr");
 	el.value = addCommas(parseInt(el.value.replace(/,/g,"")));
-	$(el).addClass("current");
+	$(el).addClass("current");	
 	
 	var stepPrice = parseInt($(".step-price input").val().replace(/,/g,""));
 	var startPrice = parseInt($(".start-price input").val().replace(/,/g,""));
 	var selectPrice = parseInt(el.value.replace(/,/g,""));
 
-	if(selectPrice%stepPrice == 0 && selectPrice >= startPrice){
+	if(selectPrice%stepPrice == 0 && selectPrice >= startPrice || isNaN(selectPrice)){
 		row.find("input").removeClass("error");
 		row.find(".note input").val(row.find(".note input").val().replace("Phạm quy",""));
 	}
 	else{
 		row.find(".note input").val("Phạm quy");
 		row.find("input").addClass("error");
+		row.insertAfter(lastRow);
 	}
 
 	var last = null;
@@ -134,6 +156,9 @@ function sort(el) {
 
 	var stt_arr = el.name.split('price');
 	totalPrice(stt_arr[1]);
+	
+	if(isNaN(selectPrice))
+		el.value = "";
 }
 
 function updateOrder() {
@@ -264,8 +289,6 @@ function fillName(el){
 		else{
 			nameInput.val("");
 		}
-
-	
 }
 
 function getKeyArray(needle, haystack) {
@@ -339,7 +362,6 @@ function clearPrice(){
 	$(".orderprice input").val("")
 	$("body").hide();
 	$("body").fadeIn();
-
 }
 
 function delRow(row_id,table_name){
@@ -378,8 +400,10 @@ function totalPrice(stt) {
 		areaId = "#areaId" + $.trim(plots[i]);
 		area = $(areaId).val();
 		total += price*area;
-  }
+	}
 	total = addCommas(total);
+	if(isNaN(total))
+		total = 0;
 	$('input[name=totalprice'+stt+']').val(total);
 }
 
