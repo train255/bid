@@ -85,25 +85,22 @@ function bindHover() {
 }
 
 function getLastRow() {
-	var lastRow = 1;
+	var last_row = 1;
 	$("#price-table tbody tr").each(function (){
 		var st = $(this).find(".stt input").val();
 		var co = $(this).find(".code input").val();
 		var na = $(this).find(".name textarea").val();
 		var pr = $(this).find(".price input").val();
-		var or = $(this).find(".orderprice input").val();
-		var pl = $(this).find(".plots input").val();
-		var to = $(this).find(".totalprice input").val();
-		if(co != "" || na != "" || or != "" || pl != "" || pr != "" || to != "") {
-			if(lastRow < st)
-				lastRow = st;
+		if(co != "" || na != "" || pr != "") {
+			if(last_row < parseInt(st))
+				last_row = parseInt(st);
 		}
 	});
-	return lastRow;
+	return last_row;
 }
 
 function sort(el) {
-	var lastRowNumber = getLastRow();
+	var lastRowNumber = getLastRow() - 1;
 	var lastRow = $("#price-table tbody tr:eq("+lastRowNumber+")");
 
 	var row = $(el).parents("tr");
@@ -114,40 +111,35 @@ function sort(el) {
 	var startPrice = parseInt($(".start-price input").val().replace(/,/g,""));
 	var selectPrice = parseInt(el.value.replace(/,/g,""));
 
-	if(selectPrice%stepPrice == 0 && selectPrice >= startPrice || isNaN(selectPrice)){
+	if(selectPrice%stepPrice == 0 && selectPrice >= startPrice ){
 		row.find("input").removeClass("error");
 		row.find(".note input").val(row.find(".note input").val().replace("Phạm quy",""));
+		var last_valid_row = null;
+		if($("#price-table tbody tr .price input:first").val()=="" && !$(el).hasClass("error")){
+			row.insertBefore($("#price-table tbody tr:first"));
+		} else
+		$("#price-table tbody tr .price input").each(function () {
+			if (!$(this).hasClass("error")) {
+				if (this.value && !$(this).hasClass("current")) {
+					var rowcompare = $(this).parents("tr");
+					if (parseInt(this.value.replace(/,/g,"")) < parseInt(el.value.replace(/,/g,""))) {
+						row.insertBefore(rowcompare);
+						return false;
+					} else {
+						last_valid_row = rowcompare;
+					}
+				}
+			}
+		});
+		if(last_valid_row)
+			row.insertAfter(last_valid_row);
 	}
 	else{
 		row.find(".note input").val("Phạm quy");
 		row.find("input").addClass("error");
-		row.insertAfter(lastRow);
+		if (row.find(".stt input").val() != lastRow.find(".stt input").val())
+			row.insertAfter(lastRow);
 	}
-
-	var last = null;
-	if($("#price-table tbody tr .price input:first").val()=="" && !$(el).hasClass("error")){
-		row.insertBefore($("#price-table tbody tr:first"));
-	} else
-	$("#price-table tbody tr .price input").each(function () {
-		if (this.value && !$(this).hasClass("current")) {
-			var rowcompare = $(this).parents("tr");
-			
-			if (parseInt(this.value.replace(/,/g,"")) < parseInt(el.value.replace(/,/g,""))
-					|| $(this).hasClass("error")) {
-				if($(el).hasClass("error"))
-					row.insertAfter(rowcompare);
-				else
-					row.insertBefore(rowcompare);
-				last = null;
-				return false;
-			} else {
-				last = rowcompare;
-			}
-		}
-	});
-
-	if(last)
-		row.insertAfter(last);
 	
 	$(el).removeClass("current");
 	
@@ -402,8 +394,6 @@ function totalPrice(stt) {
 		total += price*area;
 	}
 	total = addCommas(total);
-	if(isNaN(total))
-		total = 0;
 	$('input[name=totalprice'+stt+']').val(total);
 }
 
