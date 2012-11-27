@@ -119,9 +119,13 @@ function sort(el) {
 			row.insertBefore($("#price-table tbody tr:first"));
 		} else
 		$("#price-table tbody tr .price input").each(function () {
-			if (!$(this).hasClass("error")) {
-				if (this.value && !$(this).hasClass("current")) {
-					var rowcompare = $(this).parents("tr");
+			if (this.value && !$(this).hasClass("current")) {
+				var rowcompare = $(this).parents("tr");
+				if ($(this).hasClass("error")) {
+					row.insertBefore(rowcompare);
+					return false;
+				} else {
+					
 					if (parseInt(this.value.replace(/,/g,"")) < parseInt(el.value.replace(/,/g,""))) {
 						row.insertBefore(rowcompare);
 						return false;
@@ -228,44 +232,75 @@ function save() {
 	} else {
 		localStorage.setItem('auctionList', auction);
 	}
-	
-	var customerCode = localStorage.getItem('customerCode')
-	if(customerCode){
-		customerCode = customerCode.split(",");
-	}
-	else customerCode = Array();
-	
-	var customerName = localStorage.getItem('customerName')
-	if(customerName){
-		customerName = customerName.split(",");
-	}
-	else customerName = Array();
-	
-	var eq = 0;
-	$(".code input").each(function (){
-		
-		if(this.value){
-			var i = getKeyArray(this.value,customerCode);
-			if(i != -1){
-				customerName[i] = $(".name textarea:eq("+eq+")").val();
-			}
-			else{
-				customerCode.push(this.value);
-				customerName.push($(".name textarea:eq("+eq+")").val());
-			}
-		}
-		eq ++;
-	})
-	
-	localStorage.setItem('customerCode',customerCode);
-	localStorage.setItem('customerName',customerName);
-	
-	localStorage.setItem('row' + hex_md5(auction), $("#price-table tbody tr").length);
-	localStorage.setItem('row2' + hex_md5(auction), $("#plot-table tbody tr").length);
-	localStorage.setItem('data' + hex_md5(auction), $('form').serialize());
-	localStorage.setItem('html' + hex_md5(auction), $("#price-table tbody").html());
-	localStorage.setItem('html2' + hex_md5(auction), $("#plot-table tbody").html());
+
+	var i = 0;
+
+	$("#price-table tbody tr").each(function (){
+
+		var className = $(this).attr('class');
+
+		var st = $(this).find(".stt input").val();
+		var cd = $(this).find(".code input").val();
+		var nm = $(this).find(".name textarea").val();
+		var pr = $(this).find(".price input").val();
+		var od = $(this).find(".orderprice input").val();
+		var pl = $(this).find(".plots input").val();
+		var tt = $(this).find(".totalprice input").val();
+		var nt = $(this).find(".note input").val();
+
+		localStorage.setItem('tr_className' + i + hex_md5(auction), className);
+		localStorage.setItem('tbl_stt' + i + hex_md5(auction), st);
+		localStorage.setItem('tbl_code' + i + hex_md5(auction), cd);
+		localStorage.setItem('tbl_name' + i + hex_md5(auction), nm);
+		localStorage.setItem('tbl_price' + i + hex_md5(auction), pr);
+		localStorage.setItem('tbl_orderprice' + i + hex_md5(auction), od);
+		localStorage.setItem('tbl_plots' + i + hex_md5(auction), pl);
+		localStorage.setItem('tbl_totalprice' + i + hex_md5(auction), tt);
+		localStorage.setItem('tbl_note' + i + hex_md5(auction), nt);
+
+		i++;
+	});
+
+	localStorage.setItem('row_number' + hex_md5(auction), i);
 	setAuctionList();
+	
+//	var customerCode = localStorage.getItem('customerCode')
+//	if(customerCode){
+//		customerCode = customerCode.split(",");
+//	}
+//	else customerCode = Array();
+//	
+//	var customerName = localStorage.getItem('customerName')
+//	if(customerName){
+//		customerName = customerName.split(",");
+//	}
+//	else customerName = Array();
+//	
+//	var eq = 0;
+//	$(".code input").each(function (){
+//		
+//		if(this.value){
+//			var i = getKeyArray(this.value,customerCode);
+//			if(i != -1){
+//				customerName[i] = $(".name textarea:eq("+eq+")").val();
+//			}
+//			else{
+//				customerCode.push(this.value);
+//				customerName.push($(".name textarea:eq("+eq+")").val());
+//			}
+//		}
+//		eq ++;
+//	})
+//	
+//	localStorage.setItem('customerCode',customerCode);
+//	localStorage.setItem('customerName',customerName);
+//	
+//	localStorage.setItem('row' + hex_md5(auction), $("#price-table tbody tr").length);
+//	localStorage.setItem('row2' + hex_md5(auction), $("#plot-table tbody tr").length);
+//	localStorage.setItem('data' + hex_md5(auction), $('form').serialize());
+//	localStorage.setItem('html' + hex_md5(auction), $("#price-table tbody").html());
+//	localStorage.setItem('html2' + hex_md5(auction), $("#plot-table tbody").html());
+//	setAuctionList();
 	
 }
 
@@ -292,15 +327,52 @@ function getKeyArray(needle, haystack) {
 }
 
 function loadAuction() {
+
 	var auction = $(".auctionList").val();
+
+	var j = 0;
+	$("#price-table tbody tr").each(function (){
+		j++;
+	});
 	
 	if (auction) {
-		$("#price-table tbody").html(localStorage.getItem('html' + hex_md5(auction)));
-		$("#plot-table tbody").html(localStorage.getItem('html2' + hex_md5(auction)));
-		$("form").unserializeForm(localStorage.getItem('data' + hex_md5(auction)));
-		$('.report').slideUp("fast");
+		var num = localStorage.getItem('row_number' + hex_md5(auction));
+		for (var i = 0; i < num; i++) {
+
+			if (i >= j) {
+				addNewRow();
+			}
+			var className = localStorage.getItem('tr_className' + i + hex_md5(auction));
+
+			var st = localStorage.getItem('tbl_stt' + i + hex_md5(auction));
+			var cd = localStorage.getItem('tbl_code' + i + hex_md5(auction));
+			var nm = localStorage.getItem('tbl_name' + i + hex_md5(auction));
+			var pr = localStorage.getItem('tbl_price' + i + hex_md5(auction));
+			var od = localStorage.getItem('tbl_orderprice' + i + hex_md5(auction));
+			var pl = localStorage.getItem('tbl_plots' + i + hex_md5(auction));
+			var tt = localStorage.getItem('tbl_totalprice' + i + hex_md5(auction));
+			var nt = localStorage.getItem('tbl_note' + i + hex_md5(auction));
+
+			var row_curr = $("#price-table tbody tr:eq("+i+")");
+			$(row_curr).attr('class', className);
+
+			$(row_curr).find(".stt input").val(st);
+			$(row_curr).find(".code input").val(cd);
+			$(row_curr).find(".name textarea").val(nm);
+			$(row_curr).find(".price input").val(pr);
+			$(row_curr).find(".orderprice input").val(od);
+			$(row_curr).find(".plots input").val(pl);
+			$(row_curr).find(".totalprice input").val(tt);
+			$(row_curr).find(".note input").val(nt);
+
+		};
+		divideTop();
+//		$("#price-table tbody").html(localStorage.getItem('html' + hex_md5(auction)));
+//		$("#plot-table tbody").html(localStorage.getItem('html2' + hex_md5(auction)));
+//		$("form").unserializeForm(localStorage.getItem('data' + hex_md5(auction)));
+//		$('.report').slideUp("fast");
 		$("body").hide();
-		$("body").fadeIn();
+		$("body").fadeIn();		
 		$("textarea[class*=expand]").TextAreaExpander();
 	}
 	
