@@ -112,16 +112,16 @@ function sort(el) {
 	var selectPrice = parseInt(el.value.replace(/,/g,""));
 
 	if(selectPrice%stepPrice == 0 && selectPrice >= startPrice ){
-		row.find("input").removeClass("error");
+		$(row).removeClass("error");
 		row.find(".note input").val(row.find(".note input").val().replace("Phạm quy",""));
 		var last_valid_row = null;
-		if($("#price-table tbody tr .price input:first").val()=="" && !$(el).hasClass("error")){
+		if($("#price-table tbody tr .price input:first").val()=="" && !$(row).hasClass("error")){
 			row.insertBefore($("#price-table tbody tr:first"));
 		} else
 		$("#price-table tbody tr .price input").each(function () {
 			if (this.value && !$(this).hasClass("current")) {
 				var rowcompare = $(this).parents("tr");
-				if ($(this).hasClass("error")) {
+				if ($(rowcompare).hasClass("error")) {
 					row.insertBefore(rowcompare);
 					return false;
 				} else {
@@ -140,7 +140,7 @@ function sort(el) {
 	}
 	else{
 		row.find(".note input").val("Phạm quy");
-		row.find("input").addClass("error");
+		$(row).addClass("error");
 		if (row.find(".stt input").val() != lastRow.find(".stt input").val())
 			row.insertAfter(lastRow);
 	}
@@ -186,18 +186,22 @@ function arrangeRowColor(){
 			else
 				$(this).find(".orderprice input").val(number);
 		}
-		
-		if (alternate > 0)
-			this.className = "row1";
+
+		if ($(this).hasClass("error"))
+			this.className = "error";
 		else
-			this.className = "row0";
+			this.className = "";
+		if (alternate > 0)
+			$(this).addClass("row1");
+		else
+			$(this).addClass("row0");
 		altervalue = currentvalue;
 		
 	});
 
 	$("#price-table tbody tr .orderprice input").each(function () {
-		if ($(this).val() == "001" && !$(this).hasClass("error")) {
-			var row_orderprice = $(this).parents("tr");
+		var row_orderprice = $(this).parents("tr");
+		if ($(this).val() == "001" && !$(row_orderprice).hasClass("error")) {
 			$(row_orderprice).addClass("first");
 		}
 	});
@@ -234,11 +238,8 @@ function save() {
 	}
 
 	var i = 0;
-
 	$("#price-table tbody tr").each(function (){
-
 		var className = $(this).attr('class');
-
 		var st = $(this).find(".stt input").val();
 		var cd = $(this).find(".code input").val();
 		var nm = $(this).find(".name textarea").val();
@@ -247,7 +248,6 @@ function save() {
 		var pl = $(this).find(".plots input").val();
 		var tt = $(this).find(".totalprice input").val();
 		var nt = $(this).find(".note input").val();
-
 		localStorage.setItem('tr_className' + i + hex_md5(auction), className);
 		localStorage.setItem('tbl_stt' + i + hex_md5(auction), st);
 		localStorage.setItem('tbl_code' + i + hex_md5(auction), cd);
@@ -257,12 +257,19 @@ function save() {
 		localStorage.setItem('tbl_plots' + i + hex_md5(auction), pl);
 		localStorage.setItem('tbl_totalprice' + i + hex_md5(auction), tt);
 		localStorage.setItem('tbl_note' + i + hex_md5(auction), nt);
-
 		i++;
 	});
-
 	localStorage.setItem('row_number' + hex_md5(auction), i);
-	setAuctionList();
+
+	var j = 0;
+	$("#plot-table tbody tr").each(function (){
+		var pt = $(this).find(".plot input").val();
+		var ar = $(this).find(".area input").val();
+		localStorage.setItem('tbl2_plot' + j + hex_md5(auction), pt);
+		localStorage.setItem('tbl2_area' + j + hex_md5(auction), ar);
+		j++;
+	});
+	localStorage.setItem('row2_number' + hex_md5(auction), j);
 	
 //	var customerCode = localStorage.getItem('customerCode')
 //	if(customerCode){
@@ -300,7 +307,8 @@ function save() {
 //	localStorage.setItem('data' + hex_md5(auction), $('form').serialize());
 //	localStorage.setItem('html' + hex_md5(auction), $("#price-table tbody").html());
 //	localStorage.setItem('html2' + hex_md5(auction), $("#plot-table tbody").html());
-//	setAuctionList();
+
+	setAuctionList();
 	
 }
 
@@ -334,16 +342,19 @@ function loadAuction() {
 	$("#price-table tbody tr").each(function (){
 		j++;
 	});
+
+	var k = 0;
+	$("#plot-table tbody tr").each(function (){
+		k++;
+	});
 	
 	if (auction) {
 		var num = localStorage.getItem('row_number' + hex_md5(auction));
 		for (var i = 0; i < num; i++) {
-
 			if (i >= j) {
 				addNewRow();
 			}
 			var className = localStorage.getItem('tr_className' + i + hex_md5(auction));
-
 			var st = localStorage.getItem('tbl_stt' + i + hex_md5(auction));
 			var cd = localStorage.getItem('tbl_code' + i + hex_md5(auction));
 			var nm = localStorage.getItem('tbl_name' + i + hex_md5(auction));
@@ -355,7 +366,6 @@ function loadAuction() {
 
 			var row_curr = $("#price-table tbody tr:eq("+i+")");
 			$(row_curr).attr('class', className);
-
 			$(row_curr).find(".stt input").val(st);
 			$(row_curr).find(".code input").val(cd);
 			$(row_curr).find(".name textarea").val(nm);
@@ -364,9 +374,22 @@ function loadAuction() {
 			$(row_curr).find(".plots input").val(pl);
 			$(row_curr).find(".totalprice input").val(tt);
 			$(row_curr).find(".note input").val(nt);
-
 		};
 		divideTop();
+
+		var num2 = localStorage.getItem('row2_number' + hex_md5(auction));
+		for (var i = 0; i < num2; i++) {
+			if (i >= k) {
+				addNewRowPlot();
+			}
+			var pt = localStorage.getItem('tbl2_plot' + i + hex_md5(auction));
+			var ar = localStorage.getItem('tbl2_area' + i + hex_md5(auction));
+			
+			var row_curr = $("#plot-table tbody tr:eq("+i+")");
+			$(row_curr).find(".plot input").val(pt);
+			$(row_curr).find(".area input").val(ar);
+		};
+
 //		$("#price-table tbody").html(localStorage.getItem('html' + hex_md5(auction)));
 //		$("#plot-table tbody").html(localStorage.getItem('html2' + hex_md5(auction)));
 //		$("form").unserializeForm(localStorage.getItem('data' + hex_md5(auction)));

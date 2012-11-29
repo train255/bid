@@ -72,7 +72,7 @@ td.name input{
 	border-right:1px solid #f7f0dd;
 	border-left:1px solid #ebf9ff;
 }
-#price-table tbody tr td input.error{
+#price-table tbody tr.error td input{
 	color:red;
 }
 #price-table .row0 td{
