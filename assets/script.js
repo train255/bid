@@ -1,4 +1,8 @@
 ﻿var ste;
+var arr_row_entered = Array();
+var arr_index = 0;
+arr_row_entered[0] = 0;
+var curr_row_entered = 0;
 jQuery.fn.extend({
 	param : function (a) {
 		var s = [];
@@ -59,10 +63,10 @@ function addNewRow() {
 		html = '<tr class="row0" id="' + rowid + '">';
 	
 	if (stt < 10)
-		stt = "0" + stt;
+		stt = '0' + stt;
 	html += '<td class="stt"><input name="stt' + stt + '" value="' + stt + '"  type="text" /></td>';
 	html += '<td class="code"><input name="code' + stt + '" value="" type="text" onchange="fillName(this)"  /></td>'; 
-	html += '<td class="name"><textarea name="customername' + stt + '" value="" rows=1 class="expand"></textarea></td>';
+	html += '<td class="name"><textarea name="customername' + stt + '" value="" rows=1 class="expand" onchange="resetLastRow(this)"></textarea></td>';
 	html += '<td class="price"><input name="price' + stt + '" value="" type="text" onchange="sort(this)" /></td>';
 	html += '<td class="orderprice"><input name="orderprice' + stt + '" value="" type="text" /></td>';
 	html += '<td class="plots"><input name="plots'+stt+'" value="" type="text" onchange=checkPlots("'+stt+'") /></td>';
@@ -84,26 +88,66 @@ function bindHover() {
 	});
 }
 
-function getLastRow() {
-	var last_row = 1;
-	$("#price-table tbody tr").each(function (){
-		var st = $(this).find(".stt input").val();
-		var co = $(this).find(".code input").val();
-		var na = $(this).find(".name textarea").val();
-		var pr = $(this).find(".price input").val();
-		if(co != "" || na != "" || pr != "") {
-			if(last_row < parseInt(st))
-				last_row = parseInt(st);
+function resetLastRow(el) {
+	var sttINT = 0;
+	var row = $(el).parents("tr");
+	var sttInput = row.find(".stt input").val();
+	var codeInput = row.find(".code input").val();
+	var nameInput = row.find(".name textarea").val();
+	var priceInput = row.find(".price input").val();
+	var priceINT = parseInt(priceInput.replace(/,/g,""));
+
+	var str = sttInput.substr(0);
+	if (str[0] == "0")
+		sttINT = parseInt(str[1]);
+	else
+		sttINT = parseInt(sttInput);
+
+	if (sttINT > curr_row_entered) {
+		arr_row_entered[arr_index] = sttINT;
+		curr_row_entered = arr_row_entered[arr_index];
+		arr_index ++;
+	} else if ((sttINT < curr_row_entered) && (sttINT == curr_row_entered - 1)) {
+		if(arr_row_entered[arr_index])
+			arr_index ++;
+		arr_row_entered[arr_index] = curr_row_entered;
+		arr_row_entered[arr_index - 1] = sttINT;
+	}
+
+	if (codeInput == "" && nameInput=="" && (isNaN(priceINT) || priceInput=="")) {
+		if (sttINT == curr_row_entered && arr_index > 0) {
+			if(!arr_row_entered[arr_index])
+				arr_index = arr_index - 2;
+			else
+				arr_index = arr_index - 1;
+			curr_row_entered = arr_row_entered[arr_index];
 		}
-	});
-	return last_row;
+	}
+	console.log("Sau thay doi " + curr_row_entered);
 }
+	
+
+//function getLastRow() {
+//	var last_row = 1;
+//	$("#price-table tbody tr").each(function (){
+//		var st = $(this).find(".stt input").val();
+//		var co = $(this).find(".code input").val();
+//		var na = $(this).find(".name textarea").val();
+//		var pr = $(this).find(".price input").val();
+//		if(co != "" || na != "" || pr != "") {
+//			if(last_row < parseInt(st))
+//				last_row = parseInt(st);
+//		}
+//	});
+//	return last_row;
+//}
 
 function sort(el) {
 	var lastRowNumber = getLastRow() - 1;
 	var lastRow = $("#price-table tbody tr:eq("+lastRowNumber+")");
 
 	var row = $(el).parents("tr");
+
 	el.value = addCommas(parseInt(el.value.replace(/,/g,"")));
 	$(el).addClass("current");	
 	
@@ -118,16 +162,24 @@ function sort(el) {
 		if($("#price-table tbody tr .price input:first").val()=="" && !$(row).hasClass("error")){
 			row.insertBefore($("#price-table tbody tr:first"));
 		} else
+
 		$("#price-table tbody tr .price input").each(function () {
 			if (this.value && !$(this).hasClass("current")) {
 				var rowcompare = $(this).parents("tr");
+				var stt_rowcompare = parseInt($(rowcompare).find(".stt input").val());
+				var stt_row = parseInt($(row).find(".stt input").val());
+
+				console.log(stt_row + " " + stt_rowcompare);
+				console.log(el.value + " " + this.value);
+
 				if ($(rowcompare).hasClass("error")) {
-					row.insertBefore(rowcompare);
+					if (stt_rowcompare < stt_row)
+						row.insertBefore(rowcompare);
 					return false;
 				} else {
-					
 					if (parseInt(this.value.replace(/,/g,"")) < parseInt(el.value.replace(/,/g,""))) {
-						row.insertBefore(rowcompare);
+						if (stt_rowcompare < stt_row)
+							row.insertBefore(rowcompare);
 						return false;
 					} else {
 						last_valid_row = rowcompare;
@@ -135,6 +187,7 @@ function sort(el) {
 				}
 			}
 		});
+
 		if(last_valid_row)
 			row.insertAfter(last_valid_row);
 	}
@@ -264,44 +317,49 @@ function save() {
 	var j = 0;
 	$("#plot-table tbody tr").each(function (){
 		var pt = $(this).find(".plot input").val();
+		var ar_id = $(this).find(".area input").attr('id');
 		var ar = $(this).find(".area input").val();
 		localStorage.setItem('tbl2_plot' + j + hex_md5(auction), pt);
+		localStorage.setItem('tbl2_area_id' + j + hex_md5(auction), ar_id);
 		localStorage.setItem('tbl2_area' + j + hex_md5(auction), ar);
 		j++;
 	});
 	localStorage.setItem('row2_number' + hex_md5(auction), j);
+
+	var report_text = ste.frame.document.body.innerHTML;
+	localStorage.setItem('report_text' + hex_md5(auction), report_text);
 	
-//	var customerCode = localStorage.getItem('customerCode')
-//	if(customerCode){
-//		customerCode = customerCode.split(",");
-//	}
-//	else customerCode = Array();
-//	
-//	var customerName = localStorage.getItem('customerName')
-//	if(customerName){
-//		customerName = customerName.split(",");
-//	}
-//	else customerName = Array();
-//	
-//	var eq = 0;
-//	$(".code input").each(function (){
-//		
-//		if(this.value){
-//			var i = getKeyArray(this.value,customerCode);
-//			if(i != -1){
-//				customerName[i] = $(".name textarea:eq("+eq+")").val();
-//			}
-//			else{
-//				customerCode.push(this.value);
-//				customerName.push($(".name textarea:eq("+eq+")").val());
-//			}
-//		}
-//		eq ++;
-//	})
-//	
-//	localStorage.setItem('customerCode',customerCode);
-//	localStorage.setItem('customerName',customerName);
-//	
+	var customerCode = localStorage.getItem('customerCode');
+	if(customerCode){
+		customerCode = customerCode.split(",");
+	}
+	else customerCode = Array();
+	
+	var customerName = localStorage.getItem('customerName');
+	if(customerName){
+		customerName = customerName.split(",");
+	}
+	else customerName = Array();
+	
+	var eq = 0;
+	$(".code input").each(function (){
+		
+		if(this.value){
+			var i = getKeyArray(this.value,customerCode);
+			if(i != -1){
+				customerName[i] = $(".name textarea:eq("+eq+")").val();
+			}
+			else{
+				customerCode.push(this.value);
+				customerName.push($(".name textarea:eq("+eq+")").val());
+			}
+		}
+		eq ++;
+	});
+
+	localStorage.setItem('customerCode',customerCode);
+	localStorage.setItem('customerName',customerName);
+
 //	localStorage.setItem('row' + hex_md5(auction), $("#price-table tbody tr").length);
 //	localStorage.setItem('row2' + hex_md5(auction), $("#plot-table tbody tr").length);
 //	localStorage.setItem('data' + hex_md5(auction), $('form').serialize());
@@ -313,17 +371,19 @@ function save() {
 }
 
 function fillName(el){
-	var row = $(el).parents("tr");
+	resetLastRow(el);
+
+	var row = $(el).parents("tr");	
 	var nameInput = row.find(".name input");
 
-		var customerCode = (localStorage.getItem('customerCode') + "").split(",");
-		var customerName = (localStorage.getItem('customerName') + "").split(",");
+	var customerCode = (localStorage.getItem('customerCode') + "").split(",");
+	var customerName = (localStorage.getItem('customerName') + "").split(",");
 
-		var i = getKeyArray(el.value,customerCode);
-		if(i !=-1 ) nameInput.val(customerName[i]);
-		else{
-			nameInput.val("");
-		}
+	var i = getKeyArray(el.value,customerCode);
+	if(i !=-1 ) nameInput.val(customerName[i]);
+	else{
+		nameInput.val("");
+	}
 }
 
 function getKeyArray(needle, haystack) {
@@ -383,17 +443,22 @@ function loadAuction() {
 				addNewRowPlot();
 			}
 			var pt = localStorage.getItem('tbl2_plot' + i + hex_md5(auction));
+			var ar_id = localStorage.getItem('tbl2_area_id' + i + hex_md5(auction));
 			var ar = localStorage.getItem('tbl2_area' + i + hex_md5(auction));
 			
 			var row_curr = $("#plot-table tbody tr:eq("+i+")");
 			$(row_curr).find(".plot input").val(pt);
 			$(row_curr).find(".area input").val(ar);
+			$(row_curr).find(".area input").attr('id', ar_id);
 		};
+
+		var report_text = localStorage.getItem('report_text' + hex_md5(auction));
+		ste.frame.document.body.innerHTML = report_text;
 
 //		$("#price-table tbody").html(localStorage.getItem('html' + hex_md5(auction)));
 //		$("#plot-table tbody").html(localStorage.getItem('html2' + hex_md5(auction)));
 //		$("form").unserializeForm(localStorage.getItem('data' + hex_md5(auction)));
-//		$('.report').slideUp("fast");
+		$('.report').slideUp("fast");
 		$("body").hide();
 		$("body").fadeIn();		
 		$("textarea[class*=expand]").TextAreaExpander();
@@ -402,12 +467,31 @@ function loadAuction() {
 }
 
 function clearAuction() {
-	
 	var auction = $(".auctionList").val();
 	if (auction) {
-		localStorage.removeItem('row' + hex_md5(auction));
-		localStorage.removeItem('row2' + hex_md5(auction));
-		localStorage.removeItem('data' + hex_md5(auction));
+		var num = localStorage.getItem('row_number' + hex_md5(auction));
+		for (var i = 0; i < num; i++) {
+			localStorage.removeItem('tr_className' + i + hex_md5(auction));
+			localStorage.removeItem('tbl_stt' + i + hex_md5(auction));
+			localStorage.removeItem('tbl_code' + i + hex_md5(auction));
+			localStorage.removeItem('tbl_name' + i + hex_md5(auction));
+			localStorage.removeItem('tbl_price' + i + hex_md5(auction));
+			localStorage.removeItem('tbl_orderprice' + i + hex_md5(auction));
+			localStorage.removeItem('tbl_plots' + i + hex_md5(auction));
+			localStorage.removeItem('tbl_totalprice' + i + hex_md5(auction));
+			localStorage.removeItem('tbl_note' + i + hex_md5(auction));
+		};
+
+		var num2 = localStorage.getItem('row2_number' + hex_md5(auction));
+		for (var i = 0; i < num2; i++) {
+			localStorage.removeItem('tbl2_plot' + i + hex_md5(auction));
+			localStorage.removeItem('tbl2_area_id' + i + hex_md5(auction));
+			localStorage.removeItem('tbl2_area' + i + hex_md5(auction));
+		};
+
+		localStorage.removeItem('row_number' + hex_md5(auction));
+		localStorage.removeItem('row2_number' + hex_md5(auction));
+		localStorage.removeItem('report_text' + hex_md5(auction));
 		
 		var auctionList = localStorage.getItem('auctionList');
 		
@@ -527,8 +611,6 @@ function addNewRowPlot(){
 	var plotid = "plot"+stt;	
 
 	html = '<tr id="' + plotid + '">';
-	if (stt < 10)
-		stt = "0" + stt;
 	html += '<td class="plot"><input name="plot'+stt+'" value="" type="text" onchange=setPlotId(this,"area'+stt+'") /></td>';
 	html += '<td class="area"><input name="area'+stt+'" value="" type="text" onchange="recalculate()" /></td>';
 	html += '<td class="delrow"><input type="button" value="Xóa" onclick=delRow("#'+plotid+'","plots_table") ></td>';
