@@ -1,8 +1,4 @@
 ﻿var ste;
-var arr_row_entered = Array();
-var arr_index = 0;
-arr_row_entered[0] = 0;
-var curr_row_entered = 0;
 jQuery.fn.extend({
 	param : function (a) {
 		var s = [];
@@ -88,63 +84,18 @@ function bindHover() {
 	});
 }
 
-function resetLastRow(el) {
-	var sttINT = 0;
-	var row = $(el).parents("tr");
-	var sttInput = row.find(".stt input").val();
-	var codeInput = row.find(".code input").val();
-	var nameInput = row.find(".name textarea").val();
-	var priceInput = row.find(".price input").val();
-	var priceINT = parseInt(priceInput.replace(/,/g,""));
-
+function stt_parseINT(sttInput) {
 	var str = sttInput.substr(0);
 	if (str[0] == "0")
 		sttINT = parseInt(str[1]);
 	else
 		sttINT = parseInt(sttInput);
-
-	if (sttINT > curr_row_entered) {
-		arr_row_entered[arr_index] = sttINT;
-		curr_row_entered = arr_row_entered[arr_index];
-		arr_index ++;
-	} else if ((sttINT < curr_row_entered) && (sttINT == curr_row_entered - 1)) {
-		if(arr_row_entered[arr_index])
-			arr_index ++;
-		arr_row_entered[arr_index] = curr_row_entered;
-		arr_row_entered[arr_index - 1] = sttINT;
-	}
-
-	if (codeInput == "" && nameInput=="" && (isNaN(priceINT) || priceInput=="")) {
-		if (sttINT == curr_row_entered && arr_index > 0) {
-			if(!arr_row_entered[arr_index])
-				arr_index = arr_index - 2;
-			else
-				arr_index = arr_index - 1;
-			curr_row_entered = arr_row_entered[arr_index];
-		}
-	}
-	console.log("Sau thay doi " + curr_row_entered);
+	return sttINT;
 }
-	
-
-//function getLastRow() {
-//	var last_row = 1;
-//	$("#price-table tbody tr").each(function (){
-//		var st = $(this).find(".stt input").val();
-//		var co = $(this).find(".code input").val();
-//		var na = $(this).find(".name textarea").val();
-//		var pr = $(this).find(".price input").val();
-//		if(co != "" || na != "" || pr != "") {
-//			if(last_row < parseInt(st))
-//				last_row = parseInt(st);
-//		}
-//	});
-//	return last_row;
-//}
 
 function sort(el) {
-	var lastRowNumber = getLastRow() - 1;
-	var lastRow = $("#price-table tbody tr:eq("+lastRowNumber+")");
+
+	var lastRow = $("#price-table tbody tr:last");
 
 	var row = $(el).parents("tr");
 
@@ -161,13 +112,18 @@ function sort(el) {
 		var last_valid_row = null;
 		if($("#price-table tbody tr .price input:first").val()=="" && !$(row).hasClass("error")){
 			row.insertBefore($("#price-table tbody tr:first"));
+			last_valid_row = null;
 		} else
 
 		$("#price-table tbody tr .price input").each(function () {
 			if (this.value && !$(this).hasClass("current")) {
 				var rowcompare = $(this).parents("tr");
-				var stt_rowcompare = parseInt($(rowcompare).find(".stt input").val());
-				var stt_row = parseInt($(row).find(".stt input").val());
+
+				var stt_rowcompare = $(rowcompare).find(".stt input").val();
+				var stt_row = $(row).find(".stt input").val();
+
+				stt_rowcompare = stt_parseINT(stt_rowcompare);
+				stt_row = stt_parseINT(stt_row);
 
 				console.log(stt_row + " " + stt_rowcompare);
 				console.log(el.value + " " + this.value);
