@@ -603,3 +603,7 @@ function recalculate(){
 			totalPrice(stt_arr[1]);
 	});
 }
+
+function printtest() {
+	$('#test').jqprint();
+}

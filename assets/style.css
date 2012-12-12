@@ -4,7 +4,7 @@ html,body,input{
 	font-size:18px;
 	color:#626262;
 }
-#price-table, #plot-table {
+#price-table, #plot-table, #tblTotal {
 	background:#fff;
 	margin-top:42px;
 	border-top:2px solid #7d9b02;
@@ -12,7 +12,7 @@ html,body,input{
 	width:968px;
 }
 
-#price-table, #plot-table tbody td{
+#price-table, #plot-table, #tblTotal tbody td{
 /*	height:44px;*/
 	line-height:44px;
 	border-bottom:1px solid #f7f0dd;
@@ -81,7 +81,7 @@ td.name input{
 #price-table .row1 td{
 	background:#AFDCEC;
 }
-#price-table, #plot-table  thead td{
+#price-table, #plot-table, #tblTotal thead td{
 	background:#f6f6f6 url(head-bg.png) repeat-x;
 	text-align:center;
 	height:40px;
@@ -107,7 +107,6 @@ div > .button{
 .toolbar{
 	text-align:left;
 	width:968px;
-	
 }
 .loadbar{
 	text-align:right;
@@ -172,9 +171,16 @@ div > .button{
 	margin-left:10px;
 }
 
+/*.tablehide {*/
+/*	display:none;*/
+/*}*/
+
 @media print{
 	.toolbar,.loadbar,.bar{
 		display:none;
+	}
+	.tablehide {
+		display:block;
 	}
 }
 
