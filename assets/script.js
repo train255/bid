@@ -106,7 +106,7 @@ function sort(el) {
 	var startPrice = parseInt($(".start-price input").val().replace(/,/g,""));
 	var selectPrice = parseInt(el.value.replace(/,/g,""));
 
-	if(selectPrice%stepPrice == 0 && selectPrice >= startPrice ){
+	if( ((selectPrice - startPrice) * -1 ) % stepPrice == 0 && selectPrice >= startPrice ){
 		$(row).removeClass("error");
 		row.find(".note input").val(row.find(".note input").val().replace("Phạm quy",""));
 		var last_valid_row = null;
