@@ -245,6 +245,17 @@ function save() {
 	} else {
 		localStorage.setItem('auctionList', auction);
 	}
+	
+	var company = $('input[name=company]').val();
+	localStorage.setItem('company' + i + hex_md5(auction), company);
+	var auction = $('input[name=auction]').val();
+	localStorage.setItem('auction' + i + hex_md5(auction), auction);
+	var start_price = $('input[name=start-price]').val();
+	localStorage.setItem('start_price' + i + hex_md5(auction), start_price);
+	var step_price = $('input[name=step-price]').val();
+	localStorage.setItem('step_price' + i + hex_md5(auction), step_price);
+	var win_number = $('input[name=win_number]').val();
+	localStorage.setItem('win_number' + i + hex_md5(auction), win_number);
 
 	var i = 0;
 	$("#price-table tbody tr").each(function (){
@@ -365,6 +376,17 @@ function loadAuction() {
 	});
 	
 	if (auction) {
+		var company = localStorage.getItem('company' + i + hex_md5(auction));
+		$('input[name=company]').val(company);
+		var auction = localStorage.getItem('auction' + i + hex_md5(auction));
+		$('input[name=auction]').val(auction);
+		var start_price = localStorage.getItem('start_price' + i + hex_md5(auction));
+		$('input[name=start-price]').val(start_price);
+		var step_price = localStorage.getItem('step_price' + i + hex_md5(auction));
+		$('input[name=step-price]').val(step_price);
+		var win_number = localStorage.getItem('win_number' + i + hex_md5(auction));
+		$('input[name=win_number]').val(win_number);
+
 		var num = localStorage.getItem('row_number' + hex_md5(auction));
 		for (var i = 0; i < num; i++) {
 			if (i >= j) {
