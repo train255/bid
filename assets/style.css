@@ -24,14 +24,16 @@ html,body,input{
 
 td.divide {
 	height: 8px;
-	background: #FF0000;
+/*	background:url(hover-bg.png) repeat;*/
+	background: black;
 }
 
 td textarea{
 	resize: none;
 	background:none;
 	border:none;
-	font-size:17px;
+	font-size:18px;
+	font-weight:bold;
 	color:#626262;
 	margin:0;padding:0;
 	text-align:center;
@@ -41,7 +43,8 @@ td textarea{
 td input{
 	background:none;
 	border:none;
-	font-size:17px;
+	font-size:18px;
+	font-weight:bold;
 	color:#626262;
 	margin:0;padding:0;
 	height:44px;
@@ -60,11 +63,10 @@ td.name input{
 	color:#626262;
 }
 #price-table tbody tr.first td{
-/*	background:url(hover-bg.png) repeat;*/
-	background:#66CC00;
-	border-right:1px solid #81981f;
-	border-left:1px solid #aec64c;
-	border-bottom:1px solid #7d9809;	
+	background:#da0000;
+	border-right:1px solid #fd6262;
+	border-left:1px solid #fd6262;
+	border-bottom:1px solid #fd6262;	
 }
 #price-table tbody tr.hover td{
 	background:#FFF;	
@@ -76,10 +78,11 @@ td.name input{
 	color:red;
 }
 #price-table .row0 td{
-	background:#ECE5B6;
+/*	background:#ECE5B6;*/
+	background: white;
 }
 #price-table .row1 td{
-	background:#AFDCEC;
+	background: #8ebeff;
 }
 #price-table, #plot-table, #tblTotal thead td{
 	background:#f6f6f6 url(head-bg.png) repeat-x;
